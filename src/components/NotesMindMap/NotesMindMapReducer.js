@@ -25,6 +25,10 @@ const defaultState = {
 };
 
 export const notesMindMapReducer = (state = defaultState, { type, data }) => {
+  let edges = []
+  let nodes = []
+
+  console.log(type)
   const handleSelectedNoteChildrenFetchedAction = () => {
       const newState = cloneTreeInState();
       const childNotes = data;
@@ -50,10 +54,15 @@ export const notesMindMapReducer = (state = defaultState, { type, data }) => {
   };
 
   const handleCreateNoteSuccessAction = () => {
-    const newNote = data;
-    const newState = cloneTreeInState();
-    const parentNote = tree(newState.rootNote).find(note => newNote.parent.id === note.id);
-    parentNote.children.push(newNote);
+    const newState = { ...state }
+    let nodes = newState.nodes
+    let edges = newState.edges
+    console.log(data)
+    nodes.push({ id: data.id, label: data.name, group: (data.children && data.children.length ? 'parent' : 'children') });
+    edges.push({ from: data.parent.id, to: data.id });
+    //const newState = cloneTreeInState();
+    //const parentNote = tree(newState.rootNote).find(note => newNote.parent.id === note.id);
+    //parentNote.children.push(newNote);
     return newState;
   };
 
@@ -88,6 +97,7 @@ export const notesMindMapReducer = (state = defaultState, { type, data }) => {
   }
 
   const handleChangeSelectedNoteAction = () => {
+    console.log('selection')
     const newState = cloneTreeInState();
     newState.selectedNote = data;
     return newState;
@@ -95,7 +105,7 @@ export const notesMindMapReducer = (state = defaultState, { type, data }) => {
 
   switch (type) {
     case ROOT_NOTE_FOUND_ACTION:
-      return { ...state, rootNote: data };
+      return { ...state, rootNote: data, test: convertDataToGraph(data) };
     case CHANGE_SELECTED_NOTE_ACTION:
       return handleChangeSelectedNoteAction();
     case SELECTED_NOTE_CHILDREN_FETCHED_ACTION:
@@ -132,8 +142,33 @@ export const notesMindMapReducer = (state = defaultState, { type, data }) => {
    */
   function cloneTreeInState() {
     const clonedState = { ...state };
-    clonedState.rooNote = { ...state.rootNote };
+    clonedState.rootNote = { ...state.rootNote };
     clonedState.selectedNote = { ...state.selectedNote };
     return clonedState;
+  }
+
+  function convertDataToGraph(data) {
+    nodes.push({ id: data.id, label: data.name });
+    addChildren(data);
+
+    state.edges = edges
+    state.nodes = nodes 
+
+    nodes =[]
+    edges =[]
+    return state
+  }
+
+  function addChildren(node) {
+    if (node.children) {
+      node.children.forEach((child) => {
+        const hasChildren = child.children && child.children.length;
+        nodes.push({ id: child.id, label: child.name, group: (hasChildren ? 'parent' : 'children') });
+        edges.push({ from: node.id, to: child.id });
+        addChildren(child);
+      });
+    } else {
+      return;
+    }
   }
 };

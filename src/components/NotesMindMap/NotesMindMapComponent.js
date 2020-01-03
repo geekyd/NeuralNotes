@@ -147,6 +147,7 @@ export class NotesMindMapComponent extends Component {
   };
 
   treeToVisGraph() {
+    console.log(this.props)
     const rootNote = this.props.rootNote;
     const visNodes = [];
     const visEdges = [];
@@ -155,12 +156,12 @@ export class NotesMindMapComponent extends Component {
       throw new Error('Can not render the mind map without a root node');
     }
 
-    visNodes.push({ id: rootNote.id, label: rootNote.name });
-    addChildren(rootNote);
+    //visNodes.push({ id: rootNote.id, label: rootNote.name });
+    //addChildren(rootNote);
 
     return {
-      nodes: visNodes,
-      edges: visEdges
+      nodes: this.props.nodes,
+      edges: this.props.edges
     };
 
     function addChildren(node) {

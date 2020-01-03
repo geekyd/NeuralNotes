@@ -1,4 +1,4 @@
-export default function tree(root) {
+export default function tree(root, nodes, edges) {
   function find(predicate) {
     let foundNode;
 
@@ -23,6 +23,14 @@ export default function tree(root) {
         }
       });
     }
+  }
+
+  function findInNodes(nodes, edges) {
+
+  }
+
+  function findInEdges(nodes, edges) {
+
   }
 
   return {
