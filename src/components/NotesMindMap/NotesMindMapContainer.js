@@ -19,7 +19,7 @@ const mapStateToProps = ({
     noteText,
     showNoteNameEditor,
     isChangeParentModeActive,
-    notes,
+    nodes,
     edges,
   },
 }) => {
@@ -27,7 +27,7 @@ const mapStateToProps = ({
     selectedNote,
     showNoteNameEditor,
     noteText,
-    notes,
+    nodes,
     edges,
     isChangeParentModeActive,
   };
