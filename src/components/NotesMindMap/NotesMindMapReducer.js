@@ -10,6 +10,7 @@ import {
   CHANGE_PARENT_BUTTON_CLICKED_ACTION,
   CHANGE_PARENT_REQUEST_SUCCESS_ACTION,
   CHANGE_PARENT_REQUEST_FAIL_ACTION,
+  CHANGE_ROOT_TO_SELECTED_ITEM_ACTION,
 } from 'components/NotesMindMap/NotesMindMapActions';
 import { ROOT_NOTE_FOUND_ACTION } from 'components/App/AppActions.js';
 import {
@@ -25,6 +26,7 @@ const defaultState = {
   isChangeParentModeActive: false,
   notes: [],
   edges: [],
+  rootId: '',
 };
 
 export const notesMindMapReducer = (state = defaultState, { type, data }) => {
@@ -119,9 +121,22 @@ export const notesMindMapReducer = (state = defaultState, { type, data }) => {
   };
 
   const addRootToGraph = () => {
-    let notes = [...state.notes];
+    let notes = [];
     notes.push({ id: data.id, label: data.name });
-    return { ...state, notes };
+    return { ...state, notes, rootId: data.id, edges: [] };
+  };
+
+  const changeRootToSelectedItem = () => {
+    const newRoot = data;
+    let notes = [];
+    notes.push({
+      id: newRoot.id,
+      name: newRoot.name,
+      label: newRoot.name,
+      isNote: newRoot.isNote,
+      group: 'children',
+    });
+    return { ...state, edges: [], notes };
   };
 
   switch (type) {
@@ -153,6 +168,8 @@ export const notesMindMapReducer = (state = defaultState, { type, data }) => {
       return handleChangeParentNoteRequestSuccess();
     case CHANGE_PARENT_REQUEST_FAIL_ACTION:
       return { ...state, isChangeParentModeActive: false };
+    case CHANGE_ROOT_TO_SELECTED_ITEM_ACTION:
+      return changeRootToSelectedItem({ state, data });
     default:
       return state;
   }

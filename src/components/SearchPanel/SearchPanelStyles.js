@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { colors } from 'colors';
 import { SearchIcon } from 'icons/Search/SearchIcon';
+import { SearchCancelIcon } from 'icons/Search/SearchCancelIcon';
 
 const CONTAINER_PADDING = 6;
 const ICON_PADDING = CONTAINER_PADDING + 4;
@@ -32,4 +33,29 @@ export const StyledIcon = styled(SearchIcon)`
   top: ${ICON_PADDING}px;
   left: ${ICON_PADDING}px;
   height: calc(100% - ${ICON_PADDING * 2}px);
+`;
+
+export const StyledCancelIcon = styled(SearchCancelIcon)`
+  position: absolute;
+  top: ${ICON_PADDING}px;
+  right: ${ICON_PADDING}px;
+  height: calc(100% - ${ICON_PADDING * 2}px);
+`;
+
+export const StyledResult = styled.div`
+  position: absolute;
+  bottom: 42px;
+  left: 37.5%;
+  background-color: ${colors.lightGray};
+  width: 25%;
+  height: 160px;
+  overflow-y: auto;
+`;
+
+export const StyledResultItem = styled.div`
+  left: 37.5%;
+  background-color: ${colors.white};
+  color: ${colors.black};
+  width: 25%;
+  height: auto;
 `;

@@ -21,11 +21,20 @@ import {
   deleteNoteRequestSuccessAction,
   changeParentRequestSuccessAction,
   changeParentRequestFailAction,
+  changeRootToSelectedItem,
 } from 'components/NotesMindMap/NotesMindMapActions';
 import noteStorage from 'storage/noteStorage';
-import { ROOT_NOTE_FOUND_ACTION } from 'components/App/AppActions';
+import {
+  rootNoteFoundAction,
+  ROOT_NOTE_FOUND_ACTION,
+} from 'components/App/AppActions';
 import siteGlobalLoadingBar from 'ui/spinner/site-global-loading-bar';
-import { SEARCH_QUERY_CHANGED_ACTION } from 'components/SearchPanel/SearchPanelActions';
+import {
+  SEARCH_QUERY_CHANGED_ACTION,
+  searchResultsFetched,
+  SEARCH_RESULT_SELECTED,
+  SEARCH_EXIT_ACTION,
+} from 'components/SearchPanel/SearchPanelActions';
 import googleDriveApi from 'api/google-drive-api';
 import { UploadsActions } from 'components/Uploads/UploadsActions';
 
@@ -114,12 +123,31 @@ function* changeParentNote({ data: { noteId, newParent, edges } }) {
 }
 
 function* searchNoteSaga({ data }) {
-  const results = yield googleDriveApi.findNotesByName(data);
-  yield call(
-    [toast, toast.error],
-    'Search is not implemented yet :) See search results in console',
-  );
-  console.log('Search results: ', results);
+  let results = yield googleDriveApi.findNotesByName(data.query);
+  results = results.map(result => {
+    result.name = result.name.split('.')[0];
+    return result;
+  });
+  yield put(searchResultsFetched(results));
+}
+
+function* fetchSelectedNote({ data }) {
+  yield put(changeRootToSelectedItem(data));
+  if (didNotAttemptToFetchChildren(data, [])) {
+    const childNotes = yield fetchChildNotes(data);
+    yield put(selectedNoteChildrenFetchedAction(childNotes));
+  } else {
+    console.log('not fetching child notes');
+  }
+
+  if (data.isNote) {
+    yield requestNoteText(data);
+  }
+}
+
+function* rescanDrive() {
+  const rootNote = yield noteStorage.scanDrive();
+  yield put(rootNoteFoundAction(rootNote));
 }
 
 function didNotAttemptToFetchChildren(note, edges) {
@@ -139,11 +167,13 @@ export function* noteMindMapInit() {
   yield all([
     takeEvery(NOTE_CHANGE_PARENT_ACTION, changeParentNote),
     takeEvery(ROOT_NOTE_FOUND_ACTION, selectRootNote),
+    takeEvery(SEARCH_EXIT_ACTION, rescanDrive),
     takeEvery(CHANGE_SELECTED_NOTE_ACTION, changeSelectedNote),
     takeEvery(CREATE_EMPTY_CHILD_ACTION, createEmptyChild),
     takeEvery(DELETE_NOTE_ACTION, deleteNote),
     takeEvery(UPDATE_NOTE_NAME_ACTION, updateNoteName),
     takeEvery(SEARCH_QUERY_CHANGED_ACTION, searchNoteSaga),
+    takeEvery(SEARCH_RESULT_SELECTED, fetchSelectedNote),
     takeEvery(UploadsActions.file.uploadSuccess, uploadSuccessSaga),
   ]);
 }

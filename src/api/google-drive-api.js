@@ -201,8 +201,8 @@ function createDirectory(options) {
 }
 
 function findNotesByName(name = '') {
-  const query = `name contains '${name}' and trashed = false and mimeType = 'text/plain'`;
-  const params = { q: query };
+  const query = `name contains '${name}' and trashed = false and mimeType = 'application/vnd.google-apps.folder'`;
+  const params = { q: query, fields: FILE_LIST_FIELDS };
   const request = gapi.client.drive.files.list(params);
 
   spinner.show();

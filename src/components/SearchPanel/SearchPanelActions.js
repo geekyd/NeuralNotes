@@ -1,1 +1,9 @@
 export const SEARCH_QUERY_CHANGED_ACTION = 'SEARCH_QUERY_CHANGED_ACTION';
+export const SEARCH_RESULT_FETCHED = 'SEARCH_RESULT_FETCHED';
+export const SEARCH_RESULT_SELECTED = 'SEARCH_RESULT_SELECTED';
+export const SEARCH_EXIT_ACTION = 'SEARCH_EXIT_ACTION';
+
+export const searchResultsFetched = data => ({
+  type: SEARCH_RESULT_FETCHED,
+  data,
+});
